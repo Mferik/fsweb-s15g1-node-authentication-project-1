@@ -30,8 +30,8 @@ const bcryptjs = require("bcryptjs");
 
 router.post(
   "/register",
-  middleware.sifreGecerlimi,
   middleware.usernameBostami,
+  middleware.sifreGecerlimi,
   async (req, res, next) => {
     try {
       let hashedPassword = bcryptjs.hashSync(req.body.password);
@@ -63,10 +63,13 @@ router.post(
 router.post("/login", middleware.usernameVarmi, async (req, res, next) => {
   try {
     const { username, password } = req.body;
-        const [registeredUser] = await userModel.goreBul({username});
-        if(registeredUser && bcryptjs.compareSync(password, registeredUser.password)){
-            req.session.user = registeredUser;
-            res.json({message: `Hoşgeldin ${registeredUser.username}`});
+    const [registeredUser] = await userModel.goreBul({ username });
+    if (
+      registeredUser &&
+      bcryptjs.compareSync(password, registeredUser.password)
+    ) {
+      req.session.user = registeredUser;
+      res.status(200).json({ message: `Hoşgeldin ${registeredUser.username}` });
     } else {
       next({
         status: 401,
@@ -100,12 +103,13 @@ router.get("/logout", (req, res, next) => {
       req.session.destroy((error) => {
         if (error) {
           next({
+            status:500,
             message: "Burası Samiyen burdan çıkış yok!...",
           });
         } else {
           res.set(
-            "Set-Cookie",
-            "titan=; Path=/; Expires=Mon, 01 Jan 1970 00:00:00"
+            "Cookie",
+            "cikolatacips=; Path=/; Expires=Mon, 01 Jan 1970 00:00:00"
           );
           res.json({
             message: `Çıkış yapildi`,
@@ -113,7 +117,7 @@ router.get("/logout", (req, res, next) => {
         }
       });
     } else {
-      res.status(200).json({
+      res.status(400).json({
         message: "Oturum bulunamadı!",
       });
     }

@@ -30,8 +30,8 @@ const UserModel = require("./users-model");
 
   router.get("/", middleware.sinirli, async (req, res, next) => {
     try {
-      let user = await UserModel.bul();
-      res.json(user);
+      const allUsers = await UserModel.bul();
+      res.json(allUsers);
     } catch (error) {
       next(error);
     }

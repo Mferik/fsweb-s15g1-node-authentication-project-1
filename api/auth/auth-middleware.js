@@ -1,4 +1,5 @@
 const UserModel = require("../users/users-model");
+const bcryptjs = require("bcryptjs");
 
 /*
   Kullanıcının sunucuda kayıtlı bir oturumu yoksa
@@ -10,8 +11,8 @@ const UserModel = require("../users/users-model");
 */
 function sinirli(req, res, next) {
   try {
-    if (req.session && req.session.user_id) {
-      next()
+    if (req.session && req.session.user_id > 0) {
+      next();
     } else {
       next({
         status: 401,
@@ -58,9 +59,9 @@ async function usernameBostami(req, res, next) {
     "message": "Geçersiz kriter"
   }
 */
-async function usernameVarmi(req,res,next) {
+async function usernameVarmi(req, res, next) {
   try {
-    let existUsername = await UserModel.goreBul({
+    const existUsername = await UserModel.goreBul({
       username: req.body.username,
     });
     if (!existUsername || existUsername.length == 0) {
@@ -85,7 +86,7 @@ async function usernameVarmi(req,res,next) {
     "message": "Şifre 3 karakterden fazla olmalı"
   }
 */
-function sifreGecerlimi(req,res,next) {
+function sifreGecerlimi(req, res, next) {
   try {
     let { password } = req.body;
     if (!password || password.length < 3) {
